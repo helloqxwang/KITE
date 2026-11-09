@@ -1,0 +1,11 @@
+defaults:
+  - visualize_decoder
+  - _self_
+
+training:
+  save_dir: ./outputs/decoder_initialization_viewer
+visualization:
+  port: 8086
+hydra:
+  run:
+    dir: outputs/decoder_initialization_viewer

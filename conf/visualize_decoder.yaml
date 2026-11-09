@@ -1,0 +1,17 @@
+defaults:
+  - kite
+  - _self_
+
+# Small, fresh synthetic examples; no training buffers are read or written.
+training:
+  save_dir: ./outputs/decoder_viewer
+visualization:
+  source: synthetic
+  split: test
+  num_samples: 32
+  initial_view: initial_to_prediction
+  embodiment_opacity: 0.85
+  point_size: 0.004
+hydra:
+  run:
+    dir: outputs/decoder_viewer

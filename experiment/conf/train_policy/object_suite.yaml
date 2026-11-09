@@ -1,0 +1,129 @@
+# @package _global_
+
+interaction_policy_model:
+  name: idp3_standard
+  condition_type: film
+  use_down_condition: true
+  use_mid_condition: true
+  use_up_condition: true
+  horizon: 16
+  n_action_steps: 15
+  n_obs_steps: 2
+  obs_as_global_cond: true
+  diffusion_step_embed_dim: 128
+  down_dims:
+  - 256
+  - 512
+  - 1024
+  kernel_size: 5
+  n_groups: 8
+  num_inference_steps: 10
+  point_downsample: true
+  normalize_agent_pos: true
+  use_pc_color: false
+  pointnet_type: multi_stage_pointnet
+  pointcloud_encoder_cfg:
+    in_channels: 3
+    out_channels: 128
+    use_layernorm: true
+    final_norm: layernorm
+    normal_channel: false
+    num_points: 256
+  noise_scheduler:
+    num_train_timesteps: 50
+    beta_start: 0.0001
+    beta_end: 0.02
+    beta_schedule: squaredcos_cap_v2
+    clip_sample: true
+    set_alpha_to_one: true
+    steps_offset: 0
+    prediction_type: sample
+  normalize_point_cloud: true
+seed: 42
+experiment:
+  name: object_suite_main_paper_contacts_v1
+dataset:
+  payload_path: ./data/high_level_policy/object_suite_main_paper_contacts_v1_train.pt
+  test_episode_count: 20
+  split_seed: 42
+  batch_size: 64
+  eval_batch_size: 64
+  num_workers: 0
+  pin_memory: true
+  persistent_workers: false
+  num_trajectories_per_object: 600
+policy:
+  action_space: latent_intent
+preprocess:
+  source_format: unified_pt
+  source_pt: ./data/high_level_policy/3600_franka_robotiq_object_suite_pick_place_v2.pt
+  output_path: ./data/high_level_policy/object_suite_main_paper_contacts_v1_train.pt
+  action_space: latent_intent
+  task: objects_placing
+  kinematic_decoder_config: conf/kite.yaml
+  intent_encoder_checkpoint: checkpoints/decoder/release.pt
+  intent_encoder_device: cpu
+  intent_encoder_batch_size: 1024
+  intent_encoder_prefer_ema: true
+  latent_intent_use_xyz_translation: false
+  skip_latent_intent: false
+  contact_mode: trajectory_sparse
+  contact_sparse_capacity: 6
+  # Demonstration extraction only; these do not change decoder training.
+  contact_threshold: 0.4
+  align_exp_scale: 2.0
+  sigmoid_scale: 10.0
+  contact_position_offset_m: 0.015
+  source_embodiment: auto
+  surface_provider: auto
+  object_pointcloud_frame: world
+  tabletop_side: auto
+  fps: 20.0
+  seed: 42
+  max_episodes: -1
+  obs_point_count: 4096
+  score_chunk_frames: 4
+  score_device: auto
+  coordinate_reference_payload: null
+  # Fixed world-to-training-frame translation shared by the training and test payloads.
+  dataset_xyz_translation: [-0.1011483371257782, 0.10128126293420792, -0.8945139050483704]
+  interaction_policy_config: conf/train_policy/object_suite.yaml
+training:
+  device: cuda:0
+  epochs: 500
+  resume: false
+  save_dir: ./checkpoints/high_level_policy/object_suite_main_paper_contacts_v1
+  lr: 0.0001
+  betas:
+  - 0.95
+  - 0.999
+  eps: 1.0e-08
+  weight_decay: 1.0e-06
+  lr_scheduler: constant
+  lr_warmup_steps: 500
+  grad_clip_norm: 1.0
+  use_amp: false
+  amp_dtype: float16
+  use_ema: true
+  ema:
+    update_after_step: 0
+    inv_gamma: 1.0
+    power: 0.75
+    min_value: 0.0
+    max_value: 0.9999
+  log_every_n_steps: 10
+  eval_every_n_epochs: 10
+  save_every_n_epochs: 50
+  max_train_steps_per_epoch: null
+  max_eval_batches: null
+wandb:
+  enabled: false
+  project: action_repr
+  entity: null
+  name: object_suite_main_paper_contacts_v1
+  mode: online
+hydra:
+  run:
+    dir: outputs/train_policy_object_suite
+  job:
+    chdir: false

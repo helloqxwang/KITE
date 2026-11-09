@@ -1,0 +1,142 @@
+# @package _global_
+
+# Current experiment embodiment support matrix.
+#
+# These tags are intentionally conservative. They document what the current
+# experiment code paths actively support, not every robot asset present in the
+# repository.
+
+embodiments:
+  franka_robotiq:
+    display_name: "Franka/Panda/FR3 arm + Robotiq 2F85 gripper"
+    support_level: full_tabletop
+    tabletop: true
+    sides: [right]
+    effector: gripper
+    action_fields: [ee_pos, ee_quat_wxyz, gripper]
+    supported_by:
+      - cube_pick_synthesis
+      - objects_placing_synthesis
+      - tabletop_replay
+      - batch_rollout
+      - interaction_policy_evaluation
+      - interaction_intent_preprocessing
+
+  marvin_wuji:
+    display_name: "Marvin arm + WujiHand"
+    support_level: full_tabletop
+    tabletop: true
+    sides: [left, right]
+    effector: hand_q
+    action_fields: [ee_pos, ee_quat_wxyz, hand_q]
+    supported_by:
+      - tabletop_replay
+      - batch_rollout
+      - interaction_policy_evaluation
+      - kinematic_decoder_rollout
+      - keyboard_pressing_synthesis
+      - bottles_pumping_synthesis
+      - retarget_cube_pick
+      - objects_placing_retargeting
+      - interaction_intent_preprocessing
+
+  allegro_right:
+    display_name: "Floating Allegro right hand"
+    support_level: floating_tabletop
+    tabletop: true
+    sides: [right]
+    effector: hand_q
+    action_fields: [ee_pos, ee_quat_wxyz, hand_q]
+    supported_by:
+      - tabletop_replay
+      - batch_rollout
+      - interaction_policy_evaluation
+      - kinematic_decoder_rollout
+      - bottles_pumping_synthesis
+      - retarget_cube_pick
+      - objects_placing_retargeting
+      - interaction_intent_preprocessing
+
+  barrett:
+    display_name: "Floating Barrett hand"
+    support_level: floating_tabletop
+    tabletop: true
+    sides: [right]
+    effector: hand_q
+    action_fields: [ee_pos, ee_quat_wxyz, hand_q]
+    supported_by:
+      - tabletop_replay
+      - batch_rollout
+      - interaction_policy_evaluation
+      - kinematic_decoder_rollout
+      - retarget_cube_pick
+      - objects_placing_retargeting
+      - interaction_intent_preprocessing
+
+  wujihand_right:
+    display_name: "Floating Wuji right hand"
+    support_level: floating_tabletop
+    tabletop: true
+    sides: [right]
+    effector: hand_q
+    action_fields: [ee_pos, ee_quat_wxyz, hand_q]
+    supported_by:
+      - tabletop_replay
+      - batch_rollout
+      - interaction_policy_evaluation
+      - kinematic_decoder_rollout
+      - retarget_cube_pick
+      - objects_placing_retargeting
+      - interaction_intent_preprocessing
+
+  robotiq_gripper_stick_armless:
+    display_name: "Floating Robotiq 2F-85 gripper + stick"
+    support_level: floating_tabletop
+    tabletop: true
+    sides: []
+    effector: composite_q
+    action_fields: [robotiq_gripper_stick_q]
+    supported_by:
+      - batch_rollout
+      - interaction_policy_evaluation
+      - kinematic_decoder_rollout
+
+  mano:
+    display_name: "MANO hand"
+    support_level: partial
+    tabletop: false
+    sides: [left, right]
+    effector: mano_pose
+    action_fields: [mano_pose, mano_translation]
+    supported_by:
+      - mano_contact
+      - visualization
+      - partial_pipeline
+      - interaction_intent_preprocessing
+
+groups:
+  full_tabletop:
+    description: "Embodiments that can instantiate the tabletop MuJoCo scene."
+    embodiments: [franka_robotiq, marvin_wuji]
+  partial_hand:
+    description: "Hand-only or dataset-only representations without full tabletop arm simulation."
+    embodiments: [mano]
+  floating_tabletop:
+    description: "Floating manipulator collision bodies in the tabletop MuJoCo scene."
+    embodiments: [allegro_right, barrett, wujihand_right, robotiq_gripper_stick_armless]
+
+capabilities:
+  cube_pick_synthesis: "Scripted cube-pick data collection."
+  objects_placing_synthesis: "GraspGenX-guided YCB Objects Placing data collection."
+  objects_placing_retargeting: "Retarget YCB Objects Placing trajectories to another embodiment."
+  tabletop_replay: "Replay single-manipulator tabletop .pt payloads through TabletopManipulationEnv."
+  batch_rollout: "Batch replay/evaluation of saved tabletop trajectories."
+  interaction_policy_evaluation: "Closed-loop interaction policy evaluation in the tabletop environment."
+  kinematic_decoder_rollout: "Closed-loop kinematic decoder evaluation in the tabletop environment."
+  keyboard_pressing_synthesis: "Keyboard Pressing demonstration collection."
+  bottles_pumping_synthesis: "Bottles Pumping demonstration collection."
+  retarget_cube_pick: "Retarget Franka/Robotiq cube-pick trajectories to Marvin/Wuji."
+  interaction_intent_preprocessing: "Interaction-intent extraction and encoding from supported payloads."
+  mano_contact: "MANO sparse contact extraction."
+  visualization: "Viser visualization utilities."
+  partial_pipeline: "Partial interaction-policy and kinematic-decoder integration paths."

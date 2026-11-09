@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+**/build/
+**/dist/
+outputs/
+wandb/
+MUJOCO_LOG.TXT
+.conda/
+
+# Assets installed by download_assets.py, locally generated datasets, and
+# checkpoints. Keep the files on disk; Git tracks code and asset_downloads.json.
+.cache/
+*.pt
+*.pth
+/assets/
+/checkpoints/
+/experiment/assets/
+/experiment/data/
+/experiment/checkpoints/
+/experiment/outputs/
+/experiment/hand_demonstration/data/
+
+# The shared asset bundles also install files for tasks that will be released
+# later. They are not used by this release.
+/experiment/screw_rotating/

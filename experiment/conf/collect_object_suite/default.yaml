@@ -1,0 +1,144 @@
+# @package _global_
+
+task:
+  name: objects_placing
+  objective: pick_place
+  lift_delta: 0.03
+objects:
+  manifest: ./experiment/assets/ycb_object_suite.json
+  active_id: 008_pudding_box
+  collection_ids: null
+  mass_kg_override: 0.05
+  collision_mesh_mode: convex_decomposition
+  convex_decomposition_root: ./experiment/assets/object_suite_convex_decomposition_128
+  grasp_bank_dir: ./experiment/data/graspgenx/ycb_robotiq_2f85
+  friction:
+  - 0.0
+  - 0.0
+  - 0.0
+  x_range:
+  - 0.05
+  - 0.15
+  y_range:
+  - -0.25
+  - -0.15
+  yaw_range_deg:
+  - -180.0
+  - 180.0
+  table_clearance: 0.001
+bin:
+  center_xy:
+  - 0.1
+  - 0.05
+  inner_size:
+  - 0.2
+  - 0.2
+  wall_height: 0.03
+  wall_thickness: 0.008
+  friction:
+  - 0.8
+  - 0.005
+  - 0.0001
+  placement_reference: center
+  placement_margin: 0.0
+  bottom_tolerance: 0.03
+viewer:
+  show_collision_geoms: true
+  collision_geom_mode: overlay
+perception:
+  pointcloud_frame: world
+  pointcloud_centering: none
+  object_only_pointcloud: true
+  object_mask_erosion_pixels: 1
+  object_depth_neighbor_threshold_m: 0.03
+  object_bounds_filter_tolerance_m: 0.005
+  exclude_robot_pointcloud: true
+  exclude_table_pointcloud: true
+  include_camera_obs: true
+  camera_names:
+  - ext_cam_0
+  - ext_cam_1
+  - hand_cam
+  policy_camera_names:
+  - ext_cam_0
+  - ext_cam_1
+  camera_width: 640
+  camera_height: 360
+  target_pointcloud_num: 256
+  capture_rgb: false
+  capture_segmentation: true
+env:
+  embodiment: franka_robotiq
+  backend: mjlab
+  mode: single_right
+  timestep: 0.002
+  frame_skip: 25
+  gravity_compensation: true
+  robotiq_pad1_friction:
+  - 0.7
+  - 0.005
+  - 0.0001
+  robotiq_pad2_friction:
+  - 0.6
+  - 0.005
+  - 0.0001
+  robotiq_pad_condim: 3
+  robotiq_pad_priority: 1
+  robotiq_pad_solref:
+  - 0.004
+  - 1.0
+  robotiq_pad_solimp:
+  - 0.95
+  - 0.99
+  - 0.001
+  - 0.5
+  - 2.0
+controller:
+  arm_kp_scale: 1.0
+  arm_kv_scale: 1.0
+  arm_force_scale: 1.0
+  hand_kp_scale: 1.0
+  hand_kv_scale: 1.0
+  hand_force_scale: 1.0
+dataset:
+  num_trajectories_total: null
+  num_trajectories_per_object: 600
+  seed: 0
+  max_attempt_multiplier: 20
+  save_training_pt: ./experiment/data/high_level_policy/3600_franka_robotiq_object_suite_pick_place_v2.pt
+  save_vis_trace_npz: null
+contact_validation:
+  require_both_pads_after_lift: true
+  require_both_pads_during_attempt: true
+  require_no_pad_contact_at_end: true
+policy:
+  grasp_pose_mode: fixed
+  fixed_grasp_pose_path: ./experiment/hand_demonstration/data/object_suite_franka_robotiq/fixed_grasp_poses.npz
+  rollout_len: 120
+  approach_distance: 0.2
+  pregrasp_distance: 0.1
+  lift_distance: 0.1
+  min_downward_angle_deg: 80.0
+  gripper_base_to_tcp: 0.152
+  use_parallel_jaw_symmetry: true
+  max_grasp_candidates: 400
+  open_gripper: 0.0
+  closed_gripper: 255.0
+  timing_mode: even_tcp_speed
+ik:
+  max_iters: 120
+  damping: 0.05
+  step_scale: 1.0
+  max_step_norm: 0.25
+  pos_tolerance: 0.002
+  ori_tolerance: 0.03
+  ori_weight: 1.0
+runtime:
+  viewer: false
+  viewer_start_paused: false
+  viewer_no_hold_open: false
+hydra:
+  run:
+    dir: outputs/collect_object_suite_default
+  job:
+    chdir: false

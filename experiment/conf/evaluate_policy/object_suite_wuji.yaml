@@ -1,0 +1,349 @@
+# @package _global_
+env:
+  embodiment: wujihand_right
+  backend: raw
+  mode: single_right
+  frame_skip: 25
+  gravity_compensation: false
+  timestep: 0.002
+  enable_fingertip_collision_pads: false
+  allegro_hand_friction:
+  - 0.5
+  - 0.005
+  - 0.0001
+  allegro_hand_condim: 6
+  allegro_hand_priority: 1
+  allegro_hand_solref:
+  - 0.004
+  - 1.0
+  allegro_hand_solimp:
+  - 0.9
+  - 0.95
+  - 0.001
+  - 0.5
+  - 2.0
+  allegro_fingertip_pad_friction:
+  - 1.5
+  - 0.005
+  - 0.0001
+  allegro_fingertip_pad_condim: 6
+  allegro_fingertip_pad_priority: 2
+  allegro_fingertip_pad_solref:
+  - 0.002
+  - 1.0
+  allegro_fingertip_pad_solimp:
+  - 0.95
+  - 0.99
+  - 0.001
+  - 0.5
+  - 2.0
+  allegro_hand_collision_model: fingertip_mesh_only
+  wujihand_contact_friction:
+  - 1.0
+  - 0.005
+  - 0.0001
+perception:
+  include_camera_obs: true
+  camera_names:
+  - ext_cam_0
+  - ext_cam_1
+  policy_camera_names:
+  - ext_cam_0
+  - ext_cam_1
+  camera_width: 640
+  camera_height: 360
+  target_pointcloud_num: 256
+  exclude_robot_pointcloud: true
+  exclude_table_pointcloud: true
+  capture_rgb: false
+  capture_segmentation: true
+  pointcloud_frame: world
+  pointcloud_centering: none
+  object_only_pointcloud: true
+  object_mask_erosion_pixels: 1
+  object_depth_neighbor_threshold_m: 0.03
+  object_bounds_filter_tolerance_m: 0.005
+dataset:
+  num_trajectories: 50
+  seed: 0
+  filter_failed: true
+  save_failed_cases: false
+  max_attempt_multiplier: 3
+  save_training_pt: ./experiment/data/high_level_policy/50_wujihand_right_trajectories.pt
+  save_vis_trace_npz: null
+runtime:
+  viewer: false
+  viewer_start_paused: false
+  viewer_no_hold_open: false
+cube:
+  side_length_range:
+  - 0.035
+  - 0.05
+  height_ratio: 2.0
+  x_range:
+  - 0.06
+  - 0.18
+  y_range:
+  - -0.18
+  - 0.14
+  yaw_range_deg:
+  - -180.0
+  - 180.0
+  table_clearance: 0.003
+  mass: 0.05
+  friction:
+  - 1.2
+  - 0.005
+  - 0.0001
+task:
+  name: objects_placing
+  success_lift_metric: 0.1
+  objective: pick_place
+  lift_delta: 0.03
+ik:
+  max_iters: 120
+  damping: 0.05
+  step_scale: 1.0
+  max_step_norm: 0.25
+  pos_tolerance: 0.002
+  ori_tolerance: 0.03
+  ori_weight: 1.0
+scene:
+  table_half_extents:
+  - 0.3
+  - 8.0
+  - 0.025
+render_appearance:
+  enabled: true
+  shadows_enabled: false
+  world:
+    style: indoor
+    floor_rgba:
+    - 0.59
+    - 0.58
+    - 0.56
+    - 1.0
+    wall_rgba:
+    - 0.59
+    - 0.58
+    - 0.56
+    - 1.0
+    skybox_rgba:
+    - 0.59
+    - 0.58
+    - 0.56
+    - 1.0
+  table:
+    style: wood
+    texture_path: ./assets/textures/plywood_4k/plywood_diff_4k.png
+    texture_fallback: builtin_wood
+    texrepeat:
+    - 1.6
+    - 3.2
+    rgba:
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    material:
+      specular: 0.06
+      shininess: 0.08
+      reflectance: 0.0
+  wujihand:
+    right_hand_rgba:
+    - 0.149
+    - 0.149
+    - 0.149
+    - 1.0
+    material:
+      specular: 0.18
+      shininess: 0.2
+      reflectance: 0.03
+viewer:
+  show_collision_geoms: true
+  collision_geom_mode: overlay
+controller:
+  arm_kp_scale: 1.0
+  arm_kv_scale: 1.0
+  arm_force_scale: 1.0
+  hand_kp_scale: 1.0
+  hand_kv_scale: 0.1
+  hand_force_scale: 1.0
+  base_xyz:
+    kp: 5000.0
+    kv: 110.0
+    max_effort: 200.0
+  base_rpy:
+    kp: 2500.0
+    kv: 90.0
+    max_effort: 120.0
+  fingers:
+    kp: 150.0
+    kv: 10.0
+    max_effort: 4.0
+online_rollout:
+  interaction_policy_config_path: ./experiment/conf/train_policy/object_suite.yaml
+  kinematic_decoder_config_path: ./conf/kite.yaml
+  kinematic_decoder_checkpoint_path: ./checkpoints/decoder/release.pt
+  target_embodiment: wujihand_right
+  contact_source_pt: ./experiment/data/high_level_policy/object_suite_main_paper_contacts_v1_test.pt
+  robot_model_q_source_pt: null
+  retargeted_wuji_pt: null
+  initial_pose:
+    mode: saved
+    task: cube_pick
+    prefer_task_start_pose: true
+    pose_pt: ./experiment/data/high_level_policy/wuji_start_pose_12.pt
+  device: auto
+  start_index: 0
+  count: 100
+  indices: null
+  max_frames: 120
+  seed: 0
+  proprio_source: executed
+  controller_steps_per_prediction: 1
+  backend: raw
+  render: false
+  viewer_start_paused: false
+  viewer_no_hold_open: false
+  viewer_show_collision_geoms: false
+  viewer_collision_geom_mode: none
+  save_results_npz: ./experiment/outputs/object_suite_v2/gt_contact_test_100/object_suite_wujihand_right_gt_contact_100_results.npz
+  save_vis_trace_npz: null
+  save_training_pt: null
+  continue_on_error: false
+  progress_interval: 1
+  capture_camera_every_controller_step: false
+  render_images:
+    enabled: false
+    output_dir: ./outputs/object_suite_gt_contact_wujihand_right/render_images
+    width: 1280
+    height: 720
+    offset_xyz:
+    - 0.45
+    - 0
+    - 0.5
+    fovy: 45.0
+    camera_name: online_rollout_render_cam
+    overwrite: true
+  seed_offset: 0
+  profile:
+    enabled: false
+  parallel:
+    num_workers: 1
+    envs_per_worker: 1
+    start_method: spawn
+    devices: null
+    torch_num_threads: 1
+  non_contact:
+    force_camera_when_enabled: true
+    contact_exclusion_radius: null
+    max_raw_candidates: 8192
+    sdf_batch_size: 8192
+  contact_input: latent
+  require_contact_dt_match: true
+  object_reset_source_pt: ./experiment/data/high_level_policy/100_franka_robotiq_object_suite_pick_place_high_level_test_v2.pt
+  grasp_hold:
+    enabled: false
+    capture_phase_ids:
+    - 3
+    apply_phase_ids:
+    - 4
+  phase_finger_effort:
+    enabled: false
+    phase_ids:
+    - 5
+    max_effort: 0.1
+  phase_finger_gains:
+    enabled: false
+  phase_controller_steps:
+    enabled: false
+  expected_frame_count: 120
+objects:
+  manifest: ./experiment/assets/ycb_object_suite.json
+  active_id: 008_pudding_box
+  collection_ids: null
+  mass_kg_override: 0.05
+  collision_mesh_mode: convex_decomposition
+  convex_decomposition_root: ./experiment/assets/object_suite_convex_decomposition_128
+  grasp_bank_dir: ./experiment/data/graspgenx/ycb_robotiq_2f85
+  friction:
+  - 0.0
+  - 0.0
+  - 0.0
+  x_range:
+  - 0.05
+  - 0.15
+  y_range:
+  - -0.25
+  - -0.15
+  yaw_range_deg:
+  - -180.0
+  - 180.0
+  table_clearance: 0.001
+bin:
+  center_xy:
+  - 0.1
+  - 0.05
+  inner_size:
+  - 0.2
+  - 0.2
+  wall_height: 0.03
+  wall_thickness: 0.008
+  friction:
+  - 0.8
+  - 0.005
+  - 0.0001
+  placement_reference: center
+  placement_margin: 0.0
+  bottom_tolerance: 0.03
+policy_eval:
+  interaction_policy_config_path: ./experiment/conf/train_policy/object_suite_paper2400.yaml
+  robot_model_q_source_pt: null
+  retargeted_wuji_pt: null
+  split: all
+  start_index: 0
+  count: null
+  indices: null
+  group_object_suite: true
+  backend: raw
+  render: false
+  viewer_start_paused: false
+  viewer_no_hold_open: true
+  checkpoint_path: ./experiment/checkpoints/high_level_policy/object_suite_paper2400_main_paper_contacts_v1/best.pt
+  checkpoint_name: best.pt
+  use_ema: true
+  device: null
+  action_schedule: chunked
+  max_frames: 120
+  max_steps: 120
+  proprio_source: executed
+  match_payload_point_count: true
+  save_results_npz: ./experiment/outputs/object_suite_v2/high_level_test_100/object_suite_wujihand_right_results.npz
+  save_vis_trace_npz: null
+  save_training_pt: null
+  progress_interval: 1
+  step_progress_interval: 30
+  capture_camera_every_controller_step: false
+  profile:
+    enabled: false
+  parallel:
+    num_workers: 1
+    envs_per_worker: 1
+    start_method: spawn
+    devices: null
+    torch_num_threads: 1
+  continue_on_error: false
+  seed: null
+  payload_path: ./experiment/data/high_level_policy/object_suite_main_paper_contacts_v1_test.pt
+  object_reset_source: latent_source
+  initial_pose:
+    mode: saved
+    task: cube_pick
+    pose_pt: ./experiment/data/high_level_policy/wuji_start_pose_12.pt
+  controller_steps_per_prediction: 1
+hydra:
+  run:
+    dir: outputs/evaluate_policy_object_suite_wuji
+  job:
+    chdir: false

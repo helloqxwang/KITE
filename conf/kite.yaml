@@ -1,0 +1,218 @@
+# Kinematic decoder training configuration of the released checkpoint
+# (checkpoints/decoder/release.pt, saved at epoch 550 of this 1,200-epoch schedule).
+seed: 42
+run_tag: cpc_5embodiment_v1
+experiment:
+  name: KITE
+surface_template:
+  num_surface_points: 4096
+  per_embodiment:
+    wujihand_right: 4096
+    mano_right: 778
+    allegro_right: 4096
+    barrett: 4096
+    robotiq_gripper_stick: 4096
+  materialize_hparams: true
+decoder_bank:
+  embodiments:
+  - wujihand_right
+  - allegro_right
+  - barrett
+  - robotiq_gripper_stick
+  - mano_right
+  embodiment_specific_projectors: true
+  overrides:
+    mano_right:
+      fixed_contact_links: []
+    robotiq_gripper_stick:
+      sparse_sampling_mode: point_uniform
+      contact_count_range:
+      - 2
+      - 6
+      contact_input_points: -1
+      component_range:
+      - 1
+      - 2
+      composite_synthesis_mode: nearby
+      composite_nearby_max_distance: 0.2
+      composite_contact_count_ranges:
+        gripper:
+        - 1
+        - 3
+        stick:
+        - 1
+        - 3
+      composite_collision_filter_enabled: true
+      composite_collision_filter_margin: 0.002
+      composite_collision_filter_max_attempts: 128
+      robot_model_kwargs:
+        stick_radius: 0.008
+        stick_length: 0.08
+        stick_base_at_end: true
+        gripper_surface_fraction: 0.5
+        gripper_contact_candidate_mode: pads_no_outer
+        gripper_contact_norm_mode: pad_face_positional
+        gripper_contact_norm_variation_scale: 1.2
+synthetic_data:
+  embodiment: null
+  contact_mode: sparse
+  sparse_sampling_mode: region_uniform
+  sixd_pose_mode: movable
+  train_samples: 1000000
+  test_samples: 1000
+  fixed_contact_links:
+  - ffdistal
+  - mfdistal
+  - rfdistal
+  - lfdistal
+  - thdistal
+  - palm
+  component_range:
+  - 2
+  - 4
+  component_count_values: null
+  component_count_distribution: null
+  contact_count_range:
+  - 2
+  - 6
+  contact_input_points: -1
+  non_contact_input_points: 256
+  non_contact_sampling_radius: 0.1
+  non_contact_sdf_clearance: 0.002
+  non_contact_pattern_mode: surface_mixture
+  non_contact_component_range:
+  - 2
+  - 4
+  remove_non_contact_points: true
+  q_init_translation_noise_std: 0.005
+  q_init_rotation_noise_std_deg: 5.0
+  q_init_joint_noise_scale: 0.05
+  q_init_zero_probability: 0.0
+  random_q_init: false
+contact_noise:
+  enabled: true
+  pos_scale: 0.0
+  normal_scale: 0.1
+dataset:
+  hparams_path: ./contact_gen/contact_sampler_hparams.yaml
+  real_masks_path: null
+  generation_device: cuda
+  check_template_hash: true
+  build_batch_size: 4096
+  batch_size: 128
+  test_batch_size: 128
+  num_workers: 8
+  prefetch_factor: 2
+  pin_memory: true
+  drop_last: false
+  load_saved_buffers: true
+  save_buffers: true
+  max_contact_points: 256
+  threshold: 0.4
+  align_exp_scale: 2.0
+  sigmoid_scale: 10.0
+  component_sampling_mode: uniform
+  anchor_sampling_mode: uniform
+  anchor_temperature: 1.0
+  patch_anchor_shift_min: 0.0002
+  patch_anchor_shift_max: 0.003
+  patch_extent_min: 0.006
+  patch_extent_max: 0.05
+  patch_extent_power: 1.0
+  patch_shift_power: 1.0
+  patch_normal_jitter_max_deg: 10.0
+  patch_points_per_anchor_min: 28
+  patch_points_per_anchor_max: 84
+  patch_penetration_clearance: 8.0e-05
+  q_contact_base_translation_min:
+  - -0.4
+  - -0.4
+  - -0.4
+  q_contact_base_translation_max:
+  - 0.4
+  - 0.4
+  - 0.4
+  q_contact_base_rotation_mode: uniform_so3
+training:
+  device: cuda
+  epochs: 1200
+  supervision_mode: contact_relevant_joints
+  contact_point_normal_weight: 0.025
+  contact_fk_batch_limit: 0
+  resume: false
+  resume_checkpoint_path: null
+  lr: 0.0001
+  betas:
+  - 0.9
+  - 0.999
+  eps: 1.0e-08
+  weight_decay: 1.0e-06
+  lr_scheduler: cosine
+  lr_warmup_steps: 2000
+  grad_clip_norm: 1.0
+  use_amp: true
+  amp_dtype: bfloat16
+  compile_heads: true
+  use_ema: true
+  ema:
+    update_after_step: 0
+    inv_gamma: 1.0
+    power: 0.75
+    min_value: 0.0
+    max_value: 0.9999
+  log_every_n_steps: 10
+  eval_every_n_epochs: 10
+  save_every_n_epoch: 50
+  save_dir: ./outputs/decoder_training/checkpoints
+visualization:
+  split: train
+  embodiment: allegro_right
+  start_index: 0
+  num_samples: 16
+  initial_view: all_configurations
+  checkpoint_path: ./checkpoints/decoder/release.pt
+  checkpoint_prefer_ema: true
+  host: 127.0.0.1
+  port: 8084
+  point_size: 0.002
+  embodiment_opacity: 0.65
+  initial_resample_variant: 0
+  resample_variant_max: 63
+wandb:
+  enabled: false
+  project: KITE
+  entity: null
+  name: cp-cotrain-paired_transformer_mlp-cpc_5embodiment_v1
+  mode: online
+  resume: allow
+  run_id: null
+model:
+  variant: paired_transformer_mlp
+  run_name: paired_transformer_mlp
+  save_dir_name: paired_transformer_mlp
+  d_model: 256
+  num_heads: 8
+  num_scene_layers: 3
+  num_action_layers: 2
+  mlp_ratio: 4.0
+  hand_points: 32
+  use_contact_tokens_in_decoder: false
+  action_tokenization: per_joint
+  use_qref_action_tokens: true
+  action_token_layer_norm: true
+  step_embed_dim: 256
+  num_inference_steps: 1
+  flow_time_beta_alpha: 1.0
+  flow_time_beta_beta: 1.0
+  residual_normalizer_mode: closed_form
+  residual_normalizer_empirical_samples: 0
+  latent_intent_interface:
+    enabled: true
+    num_encoder_layers: 2
+    unpack_tokens: 4
+    unpack_mlp_ratio: 2.0
+hydra:
+  run:
+    dir: outputs/decoder_training
+  job:
+    chdir: false

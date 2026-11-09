@@ -1,0 +1,19 @@
+# @package _global_
+defaults:
+  - default
+  - _self_
+
+# 2,400 policy-training episodes plus 100 validation episodes.
+# The stratified split leaves 400 training demonstrations per object.
+dataset:
+  num_trajectories_total: 2500
+  num_trajectories_per_object: 400
+  save_training_pt: ./experiment/data/high_level_policy/paper_object_suite_2400_train_100_val_v1/source_2500.pt
+
+# Store the paper's 4,096 points; the interaction policy samples 256 at input.
+perception:
+  target_pointcloud_num: 4096
+
+hydra:
+  run:
+    dir: outputs/paper_object_suite_2400_train_100_val_v1/collect

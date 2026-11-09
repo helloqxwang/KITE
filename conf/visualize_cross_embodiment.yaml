@@ -1,0 +1,11 @@
+defaults:
+  - visualize_decoder
+  - _self_
+
+training:
+  save_dir: ./outputs/cross_embodiment_viewer
+visualization:
+  port: 8085
+hydra:
+  run:
+    dir: outputs/cross_embodiment_viewer

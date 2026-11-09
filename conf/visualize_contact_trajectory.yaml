@@ -1,0 +1,20 @@
+defaults:
+  - visualize_decoder
+  - _self_
+
+training:
+  save_dir: ./outputs/contact_trajectory_viewer
+visualization:
+  port: 8087
+  num_samples: 1
+trajectory:
+  target_embodiment: wujihand_right
+  steps: 60
+  hold_steps: 8
+  lift_height_m: 0.12
+  finger_motion: 1.0
+  calls_per_step: 1
+  clamp_joint_limits: true
+hydra:
+  run:
+    dir: outputs/contact_trajectory_viewer
